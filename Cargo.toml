@@ -7,7 +7,7 @@ license = "MIT/Apache-2.0"
 include = ["src/**/*", "Cargo.toml"]
 homepage = "https://github.com/derekdreery/dvi"
 categories = ["parsing", "encoding"]
-keywords = ["dvi", "device independent file", "tex", "latex"]
+keywords = ["dvi", "tex", "latex"]
 
 [dependencies]
 nom = "^3.0"
