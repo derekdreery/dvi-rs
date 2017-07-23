@@ -1,0 +1,8 @@
+/target/
+**/*.rs.bk
+Cargo.lock
+SPECIFICATION.html
+tests/**/*.aux
+tests/**/*.bbl
+tests/**/*.blg
+tests/**/*.log

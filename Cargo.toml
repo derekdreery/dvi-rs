@@ -1,0 +1,13 @@
+[package]
+name = "dvi"
+version = "0.1.0"
+authors = ["Richard Dodd <richard.o.dodd@gmail.com>"]
+description = "A parser for the \"device independent file\" (dvi) format"
+include = ["src/**/*", "Cargo.toml"]
+homepage = "https://github.com/derekdreery/dvi"
+categories = ["parsing", "encoding"]
+keywords = ["dvi", "device independent file", "tex", "latex"]
+
+[dependencies]
+nom = "^3.0"
+byteorder = "^1.1"
