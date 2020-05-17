@@ -3,16 +3,14 @@
 use super::util::parse_223;
 use super::{FontDef, Instruction};
 
-use nom::{be_i16, be_i24, be_i32, be_i8, be_u16, be_u24, be_u32, be_u8, IResult, Needed};
+use nom::{be_i16, be_i24, be_i32, be_i8, be_u16, be_u24, be_u32, be_u8, Err, IResult, Needed};
 
 pub fn parse(i: &[u8]) -> IResult<&[u8], Instruction> {
     match i.get(0) {
-        Some(&op) if op <= 127 => IResult::Done(&i[1..], Instruction::Set(op as u32)),
-        Some(&op) if op >= 171 && op <= 234 => {
-            IResult::Done(&i[1..], Instruction::Font((op - 171) as u32))
-        }
+        Some(&op) if op <= 127 => Ok((&i[1..], Instruction::Set(op as u32))),
+        Some(&op) if op >= 171 && op <= 234 => Ok((&i[1..], Instruction::Font((op - 171) as u32))),
         Some(&_) => parse_complex(i),
-        None => IResult::Incomplete(Needed::Unknown),
+        None => Err(Err::Incomplete(Needed::Unknown)),
     }
 }
 

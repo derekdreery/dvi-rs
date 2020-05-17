@@ -10,5 +10,5 @@ categories = ["parsing", "encoding"]
 keywords = ["dvi", "tex", "latex"]
 
 [dependencies]
-nom = "^3.0"
+nom = "^4.0"
 byteorder = "^1.1"

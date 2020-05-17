@@ -35,11 +35,11 @@ pub(crate) fn byte_width_signed(val: i32) -> u8 {
 pub(crate) fn parse_223(i: &[u8]) -> IResult<&[u8], u32> {
     let mut i = i;
     let mut count = 0;
-    while let IResult::Done(inext, _) = tag!(i, &[223][..]) {
+    while let Ok((inext, _)) = tag!(i, &[223][..]) {
         count += 1;
         i = inext;
     }
-    IResult::Done(i, count)
+    Ok((i, count))
 }
 
 #[cfg(test)]
