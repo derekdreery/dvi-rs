@@ -89,26 +89,26 @@ macro_rules! write_small {
 
 /// Dump an instruction to an impl of Write
 pub(crate) fn dump<W: Write>(i: &Instruction, writer: &mut W) -> io::Result<()> {
-    match i {
-        &Instruction::Set(ch) => dump_set(ch, writer),
-        &Instruction::SetRule(a, b) => dump_set_rule(a, b, writer),
-        &Instruction::Put(ch) => dump_put(ch, writer),
-        &Instruction::PutRule(a, b) => dump_put_rule(a, b, writer),
-        &Instruction::Nop => writer.write_u8(138),
-        &Instruction::Bop(c, p) => dump_bop(c, p, writer),
-        &Instruction::Eop => writer.write_u8(140),
-        &Instruction::Push => writer.write_u8(141),
-        &Instruction::Pop => writer.write_u8(142),
-        &Instruction::Right(amt) => dump_right(amt, writer),
-        &Instruction::W(amt) => dump_w(amt, writer),
-        &Instruction::X(amt) => dump_x(amt, writer),
-        &Instruction::Down(amt) => dump_down(amt, writer),
-        &Instruction::Y(amt) => dump_y(amt, writer),
-        &Instruction::Z(amt) => dump_z(amt, writer),
-        &Instruction::Font(num) => dump_font(num, writer),
-        &Instruction::Xxx(ref data) => dump_xxx(&data[..], writer),
-        &Instruction::FontDef(ref font_def) => dump_font_def(font_def, writer),
-        &Instruction::Pre {
+    match *i {
+        Instruction::Set(ch) => dump_set(ch, writer),
+        Instruction::SetRule(a, b) => dump_set_rule(a, b, writer),
+        Instruction::Put(ch) => dump_put(ch, writer),
+        Instruction::PutRule(a, b) => dump_put_rule(a, b, writer),
+        Instruction::Nop => writer.write_u8(138),
+        Instruction::Bop(c, p) => dump_bop(c, p, writer),
+        Instruction::Eop => writer.write_u8(140),
+        Instruction::Push => writer.write_u8(141),
+        Instruction::Pop => writer.write_u8(142),
+        Instruction::Right(amt) => dump_right(amt, writer),
+        Instruction::W(amt) => dump_w(amt, writer),
+        Instruction::X(amt) => dump_x(amt, writer),
+        Instruction::Down(amt) => dump_down(amt, writer),
+        Instruction::Y(amt) => dump_y(amt, writer),
+        Instruction::Z(amt) => dump_z(amt, writer),
+        Instruction::Font(num) => dump_font(num, writer),
+        Instruction::Xxx(ref data) => dump_xxx(&data[..], writer),
+        Instruction::FontDef(ref font_def) => dump_font_def(font_def, writer),
+        Instruction::Pre {
             format,
             numerator,
             denominator,
@@ -122,7 +122,7 @@ pub(crate) fn dump<W: Write>(i: &Instruction, writer: &mut W) -> io::Result<()> 
             comment,
             writer,
         ),
-        &Instruction::Post {
+        Instruction::Post {
             final_bop_pointer,
             numerator,
             denominator,
@@ -143,7 +143,7 @@ pub(crate) fn dump<W: Write>(i: &Instruction, writer: &mut W) -> io::Result<()> 
             writer,
         ),
 
-        &Instruction::PostPost {
+        Instruction::PostPost {
             post_pointer,
             ident,
             two_two_three,
@@ -294,9 +294,8 @@ fn dump_font_def<W: Write>(def: &FontDef, writer: &mut W) -> io::Result<()> {
         None => writer.write_u8(0),
     }?;
     writer.write_u8(def.filename.len() as u8)?;
-    match def.directory {
-        Some(ref d) => writer.write_all(&d[..])?,
-        None => {}
+    if let Some(ref d) = def.directory {
+        writer.write_all(&d[..])?
     };
     writer.write_all(&def.filename[..])?;
     Ok(())
@@ -308,7 +307,7 @@ fn dump_pre<W: Write>(
     numerator: u32,
     denominator: u32,
     magnification: u32,
-    comment: &Vec<u8>,
+    comment: &[u8],
     writer: &mut W,
 ) -> io::Result<()> {
     assert!(comment.len() < 0x100, "Comment length must fit into u8");
