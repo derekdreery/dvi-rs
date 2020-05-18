@@ -9,7 +9,7 @@ use nom::{
     IResult, Needed,
 };
 
-pub fn parse(i: &[u8]) -> IResult<&[u8], Instruction> {
+pub fn parse(i: &[u8]) -> IResult<&[u8], Instruction, ()> {
     match i.get(0) {
         Some(&op) if op <= 127 => Ok((&i[1..], Instruction::Set(op as u32))),
         Some(&op) if op >= 171 && op <= 234 => Ok((&i[1..], Instruction::Font((op - 171) as u32))),
@@ -18,7 +18,7 @@ pub fn parse(i: &[u8]) -> IResult<&[u8], Instruction> {
     }
 }
 
-fn parse_complex(input: &[u8]) -> IResult<&[u8], Instruction> {
+fn parse_complex(input: &[u8]) -> IResult<&[u8], Instruction, ()> {
     let (input, code) = be_u8(input)?;
     match code {
         // Set
@@ -205,7 +205,7 @@ fn parse_complex(input: &[u8]) -> IResult<&[u8], Instruction> {
     }
 }
 
-fn font_def(input: &[u8], number: u32) -> IResult<&[u8], Instruction> {
+fn font_def(input: &[u8], number: u32) -> IResult<&[u8], Instruction, ()> {
     let (input, checksum) = be_u32(input)?;
     let (input, scale_factor) = be_u32(input)?;
     let (input, design_size) = be_u32(input)?;

@@ -32,7 +32,7 @@ pub(crate) fn byte_width_signed(val: i32) -> u8 {
 /// A parser to count the number of times the byte 223 occurs. This parser converts Incomplete to
 /// Done, which is normally bad, but since these trailing bytes make no difference to the semantic
 /// meaning of the document, we don't care if we haven't read them all yet.
-pub(crate) fn parse_223(mut i: &[u8]) -> IResult<&[u8], u32> {
+pub(crate) fn parse_223(mut i: &[u8]) -> IResult<&[u8], u32, ()> {
     use nom::bytes::streaming::tag;
 
     let mut count = 0;

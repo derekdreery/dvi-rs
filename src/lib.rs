@@ -299,7 +299,7 @@ impl Instruction {
     }
 
     /// Parse an instruction from a byte slice
-    pub fn parse(bytes: &[u8]) -> IResult<&[u8], Self> {
+    pub fn parse(bytes: &[u8]) -> IResult<&[u8], Self, ()> {
         parser::parse(bytes)
     }
 }
