@@ -1,8 +1,10 @@
 //! functions to dump correct output to stream for each instruction type
-use super::{FontDef, Instruction};
+use crate::{
+    util::{byte_width, byte_width_signed},
+    FontDef, Instruction,
+};
 use byteorder::{BigEndian, WriteBytesExt};
 use std::io::{self, Write};
-use util::{byte_width, byte_width_signed};
 
 // Helper macros
 

@@ -27,10 +27,6 @@
 //!
 //! See SPECIFICATION.md for more details
 
-#[macro_use]
-extern crate nom;
-extern crate byteorder;
-
 mod dumper;
 mod parser;
 mod traits;
@@ -39,7 +35,7 @@ pub(crate) mod util;
 pub use nom::IResult;
 use std::io::{self, Write};
 
-pub use traits::{Dump, Parse};
+pub use crate::traits::{Dump, Parse};
 
 /// A font definition
 #[derive(Debug, Clone, PartialEq, Eq)]

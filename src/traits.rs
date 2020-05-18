@@ -3,7 +3,7 @@ use std::io::{self, Write};
 
 /// A type that can be written to a stream (serialized)
 pub trait Dump {
-    fn dump<W>(&self, &mut W) -> io::Result<()>
+    fn dump<W>(&self, _: &mut W) -> io::Result<()>
     where
         W: Write;
 }

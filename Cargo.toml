@@ -1,6 +1,6 @@
 [package]
 name = "dvi"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Richard Dodd <richard.o.dodd@gmail.com>"]
 description = "A parser for the \"device independent file\" (dvi) format"
 license = "MIT/Apache-2.0"
@@ -8,7 +8,8 @@ include = ["src/**/*", "Cargo.toml"]
 repository = "https://github.com/derekdreery/dvi-rs"
 categories = ["parsing", "encoding"]
 keywords = ["dvi", "tex", "latex"]
+edition = "2018"
 
 [dependencies]
-nom = "^4.0"
 byteorder = "^1.1"
+nom = "5.1.1"
