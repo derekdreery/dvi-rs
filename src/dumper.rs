@@ -261,7 +261,7 @@ fn dump_xxx<W: Write>(data: &[u8], writer: &mut W) -> io::Result<()> {
         data.len() < ::std::u32::MAX as usize,
         "The length of extention data won't fit in 32 bits"
     );
-    write_small!(unsigned (data.len() as u32), writer => 239, 240, 241, 242)?;
+    write_small!(unsigned data.len() as u32, writer => 239, 240, 241, 242)?;
     writer.write_all(data)?;
     Ok(())
 }

@@ -1,19 +1,18 @@
 extern crate dvi;
-use dvi::{IResult, Instruction};
+use dvi::Instruction;
 use std::fs::File;
 use std::io::Read;
-use std::str;
 
 fn parse(input: &[u8]) -> Vec<Instruction> {
     let mut input = input;
     let mut instructions = Vec::new();
     while input.len() > 0 {
         let instruction = match Instruction::parse(&input) {
-            IResult::Done(i, inst) => {
+            Result::Ok((i, inst)) => {
                 input = i;
                 inst
             }
-            IResult::Incomplete(_) | IResult::Error(_) => panic!("Parse error"),
+            Result::Err(_) => panic!("Parse error"),
         };
         instructions.push(instruction);
     }
