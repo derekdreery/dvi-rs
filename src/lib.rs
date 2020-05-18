@@ -27,18 +27,19 @@
 //!
 //! See SPECIFICATION.md for more details
 
-#[macro_use] extern crate nom;
+#[macro_use]
+extern crate nom;
 extern crate byteorder;
 
-mod traits;
-mod parser;
 mod dumper;
+mod parser;
+mod traits;
 pub(crate) mod util;
 
-use std::io::{self, Write};
 pub use nom::IResult;
+use std::io::{self, Write};
 
-pub use traits::{Parse, Dump};
+pub use traits::{Dump, Parse};
 
 /// A font definition
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -54,7 +55,7 @@ pub struct FontDef {
     /// Directory of the font file, default if None
     pub directory: Option<Vec<u8>>,
     /// Name of the font file
-    pub filename: Vec<u8>
+    pub filename: Vec<u8>,
 }
 
 /// A draw instruction
@@ -316,7 +317,12 @@ mod tests {
         for input in input {
             let mut out = Vec::new();
             input.dump(&mut out).unwrap();
-            assert_eq!(input, Instruction::parse(&out).unwrap().1, "serialized {:?}", out);
+            assert_eq!(
+                input,
+                Instruction::parse(&out).unwrap().1,
+                "serialized {:?}",
+                out
+            );
         }
     }
 
@@ -371,7 +377,7 @@ mod tests {
     fn bop() {
         ser_de(vec![
             Instruction::Bop([0; 10], 1),
-            Instruction::Bop([100; 10], -1)
+            Instruction::Bop([100; 10], -1),
         ])
     }
 
@@ -562,31 +568,27 @@ mod tests {
     }
     #[test]
     fn pre() {
-        ser_de(vec![
-            Instruction::Pre {
-                format: 2,
-                numerator: 1000,
-                denominator: 522,
-                magnification: 10203,
-                comment: b"Hi, I'm a comment".to_vec(),
-            },
-        ])
+        ser_de(vec![Instruction::Pre {
+            format: 2,
+            numerator: 1000,
+            denominator: 522,
+            magnification: 10203,
+            comment: b"Hi, I'm a comment".to_vec(),
+        }])
     }
 
     #[test]
     fn post() {
-        ser_de(vec![
-            Instruction::Post {
-                final_bop_pointer: 1023,
-                numerator: 0xfa,
-                denominator: 0xfa3d,
-                magnification: 0xfa3df,
-                tallest_height: 0xffff,
-                widest_width: 0xfff,
-                max_stack_depth: 0xfe24,
-                total_no_pages: 0xff,
-            },
-        ])
+        ser_de(vec![Instruction::Post {
+            final_bop_pointer: 1023,
+            numerator: 0xfa,
+            denominator: 0xfa3d,
+            magnification: 0xfa3df,
+            tallest_height: 0xffff,
+            widest_width: 0xfff,
+            max_stack_depth: 0xfe24,
+            total_no_pages: 0xff,
+        }])
     }
 
     #[test]

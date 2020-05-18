@@ -1,9 +1,8 @@
 extern crate dvi;
+use dvi::{IResult, Instruction};
 use std::fs::File;
 use std::io::Read;
 use std::str;
-use dvi::{Instruction, IResult};
-
 
 fn parse(input: &[u8]) -> Vec<Instruction> {
     let mut input = input;
@@ -13,8 +12,8 @@ fn parse(input: &[u8]) -> Vec<Instruction> {
             IResult::Done(i, inst) => {
                 input = i;
                 inst
-            },
-            IResult::Incomplete(_) | IResult::Error(_) => panic!("Parse error")
+            }
+            IResult::Incomplete(_) | IResult::Error(_) => panic!("Parse error"),
         };
         instructions.push(instruction);
     }
@@ -33,14 +32,20 @@ fn dump(input: &[Instruction]) -> Vec<u8> {
 #[test]
 fn main() {
     let mut input_owned = Vec::new();
-    File::open("tests/source/main.dvi").unwrap().read_to_end(&mut input_owned).unwrap();
+    File::open("tests/source/main.dvi")
+        .unwrap()
+        .read_to_end(&mut input_owned)
+        .unwrap();
     let instructions = parse(&input_owned);
     // e.g.
-    assert!(instructions[instructions.len()-1] == Instruction::PostPost {
-        post_pointer: 1826,
-        ident: 2,
-        two_two_three: 5
-    });
+    assert!(
+        instructions[instructions.len() - 1]
+            == Instruction::PostPost {
+                post_pointer: 1826,
+                ident: 2,
+                two_two_three: 5
+            }
+    );
 
     let dumped = dump(&instructions);
     // works, but not not guaranteed to in general, since a Vec<Instruciton> has multiple valid
@@ -48,9 +53,12 @@ fn main() {
     assert_eq!(input_owned, dumped);
     let parsed_again = parse(&dumped);
 
-
     for (i, (first, second)) in instructions.iter().zip(parsed_again.iter()).enumerate() {
-        assert_eq!(first, second, "Error: {:?} != {:?}, token no {}", first, second, i);
+        assert_eq!(
+            first, second,
+            "Error: {:?} != {:?}, token no {}",
+            first, second, i
+        );
     }
     assert_eq!(instructions, parsed_again);
     //println!("{:#?}", instructions);

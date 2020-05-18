@@ -2,10 +2,15 @@ use nom::IResult;
 
 /// Get the number of bytes required to store a u32
 pub(crate) fn byte_width(val: u32) -> u8 {
-    if (val & ! 0xffu32) == 0 { 1 }
-    else if (val & ! 0xff_ffu32) == 0 { 2 }
-    else if (val & ! 0xff_ff_ffu32) == 0 { 3 }
-    else { 4 }
+    if (val & !0xffu32) == 0 {
+        1
+    } else if (val & !0xff_ffu32) == 0 {
+        2
+    } else if (val & !0xff_ff_ffu32) == 0 {
+        3
+    } else {
+        4
+    }
 }
 
 /// Get the number of bytes required to store an i32
@@ -13,10 +18,15 @@ pub(crate) fn byte_width_signed(val: i32) -> u8 {
     // TODO the logic of this could do with looking over - I will remove this message once I can
     // parse documents reliably
     // TODO benchmark against < u8::MAX etc
-    if val as u32 & ! 0x7f == 0 || ! val as u32 & ! 0x7f == 0 { 1 }
-    else if val as u32 & ! 0x7f_ff == 0 || ! val as u32 & ! 0x7f_ff == 0 { 2 }
-    else if val as u32 & ! 0x7f_ff_ff == 0 || ! val as u32 & ! 0x7f_ff_ff == 0 { 3 }
-    else { 4 }
+    if val as u32 & !0x7f == 0 || !val as u32 & !0x7f == 0 {
+        1
+    } else if val as u32 & !0x7f_ff == 0 || !val as u32 & !0x7f_ff == 0 {
+        2
+    } else if val as u32 & !0x7f_ff_ff == 0 || !val as u32 & !0x7f_ff_ff == 0 {
+        3
+    } else {
+        4
+    }
 }
 
 /// A parser to count the number of times the byte 223 occurs. This parser converts Incomplete to

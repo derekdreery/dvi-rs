@@ -1,8 +1,8 @@
 //! functions to dump correct output to stream for each instruction type
-use super::{Instruction, FontDef};
-use byteorder::{WriteBytesExt, BigEndian};
-use util::{byte_width, byte_width_signed};
+use super::{FontDef, Instruction};
+use byteorder::{BigEndian, WriteBytesExt};
 use std::io::{self, Write};
+use util::{byte_width, byte_width_signed};
 
 // Helper macros
 
@@ -114,7 +114,14 @@ pub(crate) fn dump<W: Write>(i: &Instruction, writer: &mut W) -> io::Result<()> 
             denominator,
             magnification,
             ref comment,
-        } => dump_pre(format, numerator, denominator, magnification, comment, writer),
+        } => dump_pre(
+            format,
+            numerator,
+            denominator,
+            magnification,
+            comment,
+            writer,
+        ),
         &Instruction::Post {
             final_bop_pointer,
             numerator,
@@ -124,8 +131,17 @@ pub(crate) fn dump<W: Write>(i: &Instruction, writer: &mut W) -> io::Result<()> 
             widest_width,
             max_stack_depth,
             total_no_pages,
-        } => dump_post(final_bop_pointer, numerator, denominator, magnification, tallest_height,
-                       widest_width, max_stack_depth, total_no_pages, writer),
+        } => dump_post(
+            final_bop_pointer,
+            numerator,
+            denominator,
+            magnification,
+            tallest_height,
+            widest_width,
+            max_stack_depth,
+            total_no_pages,
+            writer,
+        ),
 
         &Instruction::PostPost {
             post_pointer,
@@ -157,7 +173,7 @@ fn dump_set<W: Write>(ch: u32, writer: &mut W) -> io::Result<()> {
             writer.write_u8(131)?;
             writer.write_u32::<BigEndian>(ch)?;
         }
-        _ => { unreachable!() }
+        _ => unreachable!(),
     };
     Ok(())
 }
@@ -235,14 +251,16 @@ fn dump_font<W: Write>(f: u32, writer: &mut W) -> io::Result<()> {
             writer.write_u8(238)?;
             writer.write_u32::<BigEndian>(f)?;
         }
-        _ => { unreachable!() }
+        _ => unreachable!(),
     };
     Ok(())
 }
 
 fn dump_xxx<W: Write>(data: &[u8], writer: &mut W) -> io::Result<()> {
-    assert!(data.len() < ::std::u32::MAX as usize,
-            "The length of extention data won't fit in 32 bits");
+    assert!(
+        data.len() < ::std::u32::MAX as usize,
+        "The length of extention data won't fit in 32 bits"
+    );
     write_small!(unsigned (data.len() as u32), writer => 239, 240, 241, 242)?;
     writer.write_all(data)?;
     Ok(())
@@ -254,16 +272,19 @@ fn dump_font_def_helper<W: Write>(v: u32, writer: &mut W) -> io::Result<()> {
     write_small!(unsigned v, writer => 243, 244, 245, 246)
 }
 
-
 fn dump_font_def<W: Write>(def: &FontDef, writer: &mut W) -> io::Result<()> {
-
-    assert!(def.filename.len() <= ::std::u8::MAX as usize,
-            "Filename too long in Font Definition");
+    assert!(
+        def.filename.len() <= ::std::u8::MAX as usize,
+        "Filename too long in Font Definition"
+    );
     assert!(
         if let Some(ref d) = def.directory {
             d.len() <= ::std::u8::MAX as usize
-        } else { true },
-        "Directory name too long in Font Definition");
+        } else {
+            true
+        },
+        "Directory name too long in Font Definition"
+    );
     dump_font_def_helper(def.number, writer)?;
     writer.write_u32::<BigEndian>(def.checksum)?;
     writer.write_u32::<BigEndian>(def.scale_factor)?;
@@ -275,19 +296,21 @@ fn dump_font_def<W: Write>(def: &FontDef, writer: &mut W) -> io::Result<()> {
     writer.write_u8(def.filename.len() as u8)?;
     match def.directory {
         Some(ref d) => writer.write_all(&d[..])?,
-        None => {},
+        None => {}
     };
     writer.write_all(&def.filename[..])?;
     Ok(())
 }
 
 /// Pre
-fn dump_pre<W: Write>(format: u8,
-                      numerator: u32,
-                      denominator: u32,
-                      magnification: u32,
-                      comment: &Vec<u8>,
-                      writer: &mut W) -> io::Result<()> {
+fn dump_pre<W: Write>(
+    format: u8,
+    numerator: u32,
+    denominator: u32,
+    magnification: u32,
+    comment: &Vec<u8>,
+    writer: &mut W,
+) -> io::Result<()> {
     assert!(comment.len() < 0x100, "Comment length must fit into u8");
     writer.write_u8(247)?;
     writer.write_u8(format)?;
@@ -300,15 +323,17 @@ fn dump_pre<W: Write>(format: u8,
 }
 
 /// Post
-fn dump_post<W: Write>(final_bop_pointer: i32,
-                       numerator: u32,
-                       denominator: u32,
-                       magnification: u32,
-                       tallest_height: i32,
-                       widest_width: i32,
-                       max_stack_depth: u16,
-                       total_no_pages: u16,
-                       writer: &mut W) -> io::Result<()> {
+fn dump_post<W: Write>(
+    final_bop_pointer: i32,
+    numerator: u32,
+    denominator: u32,
+    magnification: u32,
+    tallest_height: i32,
+    widest_width: i32,
+    max_stack_depth: u16,
+    total_no_pages: u16,
+    writer: &mut W,
+) -> io::Result<()> {
     writer.write_u8(248)?;
     writer.write_i32::<BigEndian>(final_bop_pointer)?;
     writer.write_u32::<BigEndian>(numerator)?;
@@ -321,10 +346,12 @@ fn dump_post<W: Write>(final_bop_pointer: i32,
     Ok(())
 }
 
-fn dump_postpost<W: Write>(post_pointer: u32,
-                           ident: u8,
-                           two_two_three: u32,
-                           writer: &mut W) -> io::Result<()> {
+fn dump_postpost<W: Write>(
+    post_pointer: u32,
+    ident: u8,
+    two_two_three: u32,
+    writer: &mut W,
+) -> io::Result<()> {
     writer.write_u8(249)?;
     writer.write_u32::<BigEndian>(post_pointer)?;
     writer.write_u8(ident)?;
@@ -333,4 +360,3 @@ fn dump_postpost<W: Write>(post_pointer: u32,
     }
     Ok(())
 }
-
