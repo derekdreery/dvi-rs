@@ -602,4 +602,13 @@ mod tests {
             },
         ])
     }
+
+    #[test]
+    fn invalid_op_code() {
+        for invalid_op_code in 250..=255 {
+            let input = [invalid_op_code];
+            let output = Instruction::parse(&input);
+            assert!(output.is_err())
+        }
+    }
 }
