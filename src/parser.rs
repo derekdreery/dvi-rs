@@ -6,22 +6,14 @@ use nom::{
     bytes::streaming::take,
     combinator::map,
     number::streaming::{be_i16, be_i24, be_i32, be_i8, be_u16, be_u24, be_u32, be_u8},
-    IResult, Needed,
+    IResult,
 };
 
-pub fn parse(i: &[u8]) -> IResult<&[u8], Instruction> {
-    match i.get(0) {
-        Some(&op) if op <= 127 => Ok((&i[1..], Instruction::Set(op as u32))),
-        Some(&op) if op >= 171 && op <= 234 => Ok((&i[1..], Instruction::Font((op - 171) as u32))),
-        Some(&_) => parse_complex(i),
-        None => Err(nom::Err::Incomplete(Needed::Unknown)),
-    }
-}
-
-fn parse_complex(input: &[u8]) -> IResult<&[u8], Instruction> {
+pub fn parse(input: &[u8]) -> IResult<&[u8], Instruction> {
     let (input, code) = be_u8(input)?;
     match code {
         // Set
+        0..=127 => Ok((input, Instruction::Set(code as u32))),
         128 => map(be_u8, |ch| Instruction::Set(ch.into()))(input),
         129 => map(be_u16, |ch| Instruction::Set(ch.into()))(input),
         130 => map(be_u24, Instruction::Set)(input),
@@ -104,6 +96,7 @@ fn parse_complex(input: &[u8]) -> IResult<&[u8], Instruction> {
         169 => map(be_i24, |a| Instruction::Z(Some(a)))(input),
         170 => map(be_i32, |a| Instruction::Z(Some(a)))(input),
         // Font
+        171..=234 => Ok((input, Instruction::Font((code - 171) as u32))),
         235 => map(be_u8, |f| Instruction::Font(f.into()))(input),
         236 => map(be_u16, |f| Instruction::Font(f.into()))(input),
         237 => map(be_u24, Instruction::Font)(input),
@@ -201,7 +194,8 @@ fn parse_complex(input: &[u8]) -> IResult<&[u8], Instruction> {
                 },
             ))
         }
-        _ => unreachable!(),
+        // Invalid op code
+        250..=255 => Err(nom::Err::Failure((input, nom::error::ErrorKind::TooLarge))),
     }
 }
 
